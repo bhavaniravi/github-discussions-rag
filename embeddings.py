@@ -12,10 +12,11 @@ class Embedding:
 
 
     def create_embedding(self, data: Data):
+        self.appended_q_a_list = []
         for question in data.questions:
             answers = question.answers
             # we are appending each question to each answer in a discussion
-            self.appended_q_a_list = ["\n".join(question, answer.ans) for answer in answers]
+            self.appended_q_a_list.extend([question.question + '\n\n\n'+ answer.ans for answer in answers])
             self.docs_embed = self.model.encode(self.appended_q_a_list, normalize_embeddings=True)
 
 
@@ -29,9 +30,5 @@ class Embedding:
         CONTEXT = ""
         for i, p in enumerate(most_similar_documents):
             wrapped_text = textwrap.fill(p, width=100)
-
-            print("-----------------------------------------------------------------")
-            print(wrapped_text)
-            print("-----------------------------------------------------------------")
             CONTEXT += wrapped_text + "\n\n"
         return CONTEXT

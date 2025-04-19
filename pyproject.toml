@@ -7,5 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "azure-ai-inference>=1.0.0b9",
     "numpy>=2.2.4",
+    "python-dotenv>=1.1.0",
     "sentence-transformers>=4.1.0",
 ]

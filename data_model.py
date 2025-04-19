@@ -1,16 +1,17 @@
 from typing import List, Dict
 from dataclasses import dataclass
 
+
 @dataclass
 class Answer:
-    id: str
     ans: str
+    id: str = None
 
 @dataclass
 class Question:
-    id: str
     question: str 
     answers: List[Answer]
+    id: str = None
 
 @dataclass
 class Data:
