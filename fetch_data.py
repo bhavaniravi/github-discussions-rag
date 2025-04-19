@@ -1,0 +1,73 @@
+import json
+import os
+
+from data_model import Data, Question, Answer
+
+from gql import gql, Client
+from gql.transport.aiohttp import AIOHTTPTransport
+
+
+# Select your transport with a defined url endpoint
+token = os.environ["GITHUB_TOKEN"]
+transport = AIOHTTPTransport(url="https://api.github.com/graphql", headers={"Authorization": f"Bearer {token}"})
+
+# Create a GraphQL client using the defined transport
+client = Client(transport=transport, fetch_schema_from_transport=True)
+
+
+get_repo_discussions_query_v2 = gql(
+    """
+    query GetRepositoryDiscussions {
+    repository(owner: "apache", name: "airflow") {
+      discussions(first: 1) {
+        totalCount
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+        nodes {
+          id
+          title
+          url
+          createdAt
+          author {
+            login
+            url
+          }
+          category {
+            name
+          }
+          comments(first: 5){
+            nodes {
+              id
+              author {
+                login
+                url
+              }
+              bodyText
+            }
+          }
+        }
+      }
+    }
+  }
+
+"""
+)
+
+
+def fetch_discussions():
+    # Execute the query on the transport
+    result = client.execute(get_repo_discussions_query_v2)
+    
+    questions = []
+    for discussion in result["repository"]["discussions"]["nodes"]:
+        answers = []
+        for comment in discussion["comments"]["nodes"]:
+            answers.append(Answer(id=comment["id"], ans=comment["bodyText"]))
+        
+        questions.append(Question(id=discussion["id"], question=discussion["title"], answers=answers))
+    
+    return Data(questions=questions)
