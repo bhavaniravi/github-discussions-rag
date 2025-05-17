@@ -4,7 +4,18 @@ from backend import get_answer
 st.title("Do RAG based Q&A")
 
 def response_generator(prompt):
-    return get_answer("airflow", prompt)
+    return get_answer(st.session_state.selected_project.split('/')[-1], prompt)
+
+if "projects" not in st.session_state:
+    st.session_state.projects = {}
+    st.session_state.selected_project = ""
+
+selected_project = st.selectbox(
+    "Which Github project do you wanna query on?",
+    st.session_state.projects.keys(),
+)
+st.session_state.selected_project = selected_project
+
 
 
 # Initialize chat history
