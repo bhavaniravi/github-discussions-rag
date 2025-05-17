@@ -1,5 +1,7 @@
 import re
 import streamlit as st
+from backend import add_github_project
+
 
 st.title("Add Github Project")
 
@@ -29,6 +31,7 @@ title = st.text_input("Repo URL")
 if title:
     if is_valid_github_repo(title):
         st.session_state.projects[title] = title
+        add_github_project(title)
         st.success(f"Project added!")
     else:
         st.error("Invalid GitHub repository URL. Please enter a valid URL.")
