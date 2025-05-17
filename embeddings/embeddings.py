@@ -4,12 +4,10 @@ import numpy as np
 import textwrap
 
 class Embedding:
-    def __init__(self, data: Data):
+    def __init__(self):
         self.docs_embed = None # nd array with embedding
         self.appended_q_a_list = None # qa docs array to get the embeddings back to data
         self.model = SentenceTransformer("Alibaba-NLP/gte-base-en-v1.5", trust_remote_code=True)
-        self.create_embedding(data)
-
 
     def create_embedding(self, data: Data):
         self.appended_q_a_list = []

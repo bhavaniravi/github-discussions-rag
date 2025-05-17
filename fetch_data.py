@@ -19,7 +19,7 @@ get_repo_discussions_query_v2 = gql(
     """
     query GetRepositoryDiscussions {
     repository(owner: "apache", name: "airflow") {
-      discussions(first: 1) {
+      discussions(first: 30) {
         totalCount
         pageInfo {
           startCursor
@@ -70,4 +70,5 @@ def fetch_discussions():
         
         questions.append(Question(id=discussion["id"], question=discussion["title"], answers=answers))
     
+    print ("got questions count=", len(questions))
     return Data(questions=questions)
