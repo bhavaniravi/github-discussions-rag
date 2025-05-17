@@ -17,8 +17,8 @@ client = Client(transport=transport, fetch_schema_from_transport=True)
 
 get_repo_discussions_query_v2 = gql(
     """
-    query GetRepositoryDiscussions {
-    repository(owner: "apache", name: "airflow") {
+    query GetRepositoryDiscussions($owner: String!, $project_name: String!) {
+    repository(owner: $owner, name: $project_name) {
       discussions(first: 30) {
         totalCount
         pageInfo {
@@ -58,9 +58,9 @@ get_repo_discussions_query_v2 = gql(
 )
 
 
-def fetch_discussions():
+def fetch_discussions(owner, project_name):
     # Execute the query on the transport
-    result = client.execute(get_repo_discussions_query_v2)
+    result = client.execute(get_repo_discussions_query_v2, variable_values={"owner": owner, "project_name": project_name})
     
     questions = []
     for discussion in result["repository"]["discussions"]["nodes"]:

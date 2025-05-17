@@ -14,6 +14,6 @@ add_github_project(project_url)
 
 while True:
     query = input('\nquery> ')
-    answer = get_answer(project_url, query)
+    answer = get_answer('airflow', query)
     print(answer)
 

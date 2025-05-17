@@ -17,14 +17,24 @@ client = openai.OpenAI(
 def get_project_name_from_github_url(url: str) -> str:
 	return url.split('/')[-1]
 
+def get_project_owner_from_github_url(url: str) -> str:
+	return url.split('/')[-2]
+
+
 def add_github_project(url: str) -> bool:
     project_name = get_project_name_from_github_url(url)
+    owner = get_project_owner_from_github_url(url)
     embedding = chroma_embedding.ChromaEmbedding(collection_name=project_name)
+
     if not embedding.embedding_exists:
-        data = fetch_discussions()
+        data = fetch_discussions(owner, project_name)
         embedding.create_embedding(data)
     return True
 
+def list_projects():
+      import os
+      return os.listdir("data")
+      
 
 def construct_prompt(project_name, query):
 	embedding_obj = chroma_embedding.ChromaEmbedding(collection_name=project_name)
@@ -39,8 +49,7 @@ def construct_prompt(project_name, query):
 	return prompt
 
 
-def get_answer(url, query) -> str:
-    project_name = get_project_name_from_github_url(url)
+def get_answer(project_name, query) -> str:
     prompt = construct_prompt(project_name, query)
 
     print (prompt)
