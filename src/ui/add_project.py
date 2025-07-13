@@ -1,9 +1,10 @@
 import re
 import streamlit as st
-from backend import add_github_project
+from src.backend import add_github_project
 
 
 st.title("Add Github Project")
+
 
 def is_valid_github_repo(url: str) -> bool:
     """
@@ -32,14 +33,12 @@ if title:
     if is_valid_github_repo(title):
         st.session_state.projects[title] = title
         add_github_project(title)
-        st.success(f"Project added!")
+        st.success("Project added!")
     else:
         st.error("Invalid GitHub repository URL. Please enter a valid URL.")
 
 st.markdown("""
 ### Added Projects
-
-"""
-)
+""")
 for idx, item in enumerate(st.session_state.projects, start=1):
     st.write(f"{idx}. {item}")

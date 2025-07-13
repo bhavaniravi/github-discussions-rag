@@ -1,5 +1,6 @@
 import chromadb
-from data_model import Data
+from chromadb.errors import NotFoundError
+from src.github.data_model import Data
 
 
 class ChromaEmbedding:
@@ -9,7 +10,7 @@ class ChromaEmbedding:
         try:
             self.collection = self.chroma_client.get_collection(collection_name)
             self.embedding_exists = True
-        except:
+        except NotFoundError:
             self.collection = self.chroma_client.create_collection(collection_name)
 
     def create_embedding(self, data: Data):
@@ -23,19 +24,15 @@ class ChromaEmbedding:
             q_a_list = []
             q_a_id = []
             for answer in answers:
-                q_a_list.append(question.question + '\n\n\n'+ answer.ans)
-                q_a_id.append(question.id + '_' + answer.id)
+                q_a_list.append(question.question + "\n\n\n" + answer.ans)
+                q_a_id.append(question.id + "_" + answer.id)
 
-            self.collection.add(
-                documents=q_a_list,
-                ids=q_a_id
-            )
-
+            self.collection.add(documents=q_a_list, ids=q_a_id)
 
     def fetch_document(self, query: str, top_n=3):
         results = self.collection.query(
-            query_texts=[query], # Chroma will embed this for you
-            n_results=top_n # how many results to return
+            query_texts=[query],  # Chroma will embed this for you
+            n_results=top_n,  # how many results to return
         )
         print(results)
         return results["documents"][:top_n]

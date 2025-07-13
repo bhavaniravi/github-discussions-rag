@@ -3,10 +3,9 @@ from dotenv import load_dotenv
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
-from fetch_data import fetch_discussions
-import os
-from embeddings.embeddings import Embedding
-from embeddings.chroma_embedding import ChromaEmbedding
+from src.github.fetch_data import fetch_discussions
+from src.embeddings.embeddings import Embedding
+from src.embeddings.chroma_embedding import ChromaEmbedding
 # from test import data
 
 load_dotenv()
@@ -15,7 +14,7 @@ endpoint = "https://models.github.ai/inference"
 model = "openai/gpt-4.1"
 token = os.environ["GITHUB_TOKEN"]
 
-print ("constructing embedding object")
+print("constructing embedding object")
 
 embedding = "chroma"
 if embedding == "chroma":
@@ -26,7 +25,7 @@ else:
 data = fetch_discussions()
 embedding_obj.create_embedding(data)
 
-print ("embedding object constructed")
+print("embedding object constructed")
 
 client = ChatCompletionsClient(
     endpoint=endpoint,
@@ -34,7 +33,7 @@ client = ChatCompletionsClient(
 )
 
 while True:
-    query = input('\nquery> ')
+    query = input("\nquery> ")
 
     prompt = f"""
     use the following CONTEXT to answer the QUESTION at the end.
@@ -45,17 +44,18 @@ while True:
 
     """
 
-    print ("document fetched", prompt)
+    print("document fetched", prompt)
 
     response = client.complete(
         messages=[
-            SystemMessage("You're an Q and A agent who answers questions based on the rag"),
-            UserMessage(prompt)
+            SystemMessage(
+                "You're an Q and A agent who answers questions based on the rag"
+            ),
+            UserMessage(prompt),
         ],
         temperature=1.0,
         top_p=1.0,
-        model=model
+        model=model,
     )
-    print ("fetching llm response...")
+    print("fetching llm response...")
     print(response.choices[0].message.content)
-

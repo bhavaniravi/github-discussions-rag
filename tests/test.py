@@ -1,4 +1,4 @@
-# from embeddings import Embedding
+# from src.embeddings import Embedding
 # from data_model import Data, Question, Answer
 
 # question_1 = Question(

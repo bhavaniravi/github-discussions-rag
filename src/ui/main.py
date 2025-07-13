@@ -1,7 +1,8 @@
 import streamlit as st
+from dotenv import load_dotenv
 
-# Title
-st.title("Github Discussions Ragify")
+load_dotenv()
+st.title("Ragify Github Discussions")
 
 # st.markdown("""
 # ### Welcome to the Github Discussions Ragify App!
@@ -11,5 +12,5 @@ st.title("Github Discussions Ragify")
 # - Do Q&A
 # """)
 
-pg = st.navigation(["st_pages/welcome.py", "st_pages/add_project.py", "st_pages/q_and_a.py"])
+pg = st.navigation(["welcome.py", "add_project.py", "q_and_a.py"])
 pg.run()

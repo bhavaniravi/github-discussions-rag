@@ -7,11 +7,13 @@ class Answer:
     ans: str
     id: str = None
 
+
 @dataclass
 class Question:
-    question: str 
+    question: str
     answers: List[Answer]
     id: str = None
+
 
 @dataclass
 class Data:

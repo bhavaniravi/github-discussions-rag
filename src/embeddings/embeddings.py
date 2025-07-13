@@ -1,22 +1,30 @@
-from data_model import Data
+from src.github.data_model import Data
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import textwrap
 
+
 class Embedding:
     def __init__(self):
-        self.docs_embed = None # nd array with embedding
-        self.appended_q_a_list = None # qa docs array to get the embeddings back to data
-        self.model = SentenceTransformer("Alibaba-NLP/gte-base-en-v1.5", trust_remote_code=True)
+        self.docs_embed = None  # nd array with embedding
+        self.appended_q_a_list = (
+            None  # qa docs array to get the embeddings back to data
+        )
+        self.model = SentenceTransformer(
+            "Alibaba-NLP/gte-base-en-v1.5", trust_remote_code=True
+        )
 
     def create_embedding(self, data: Data):
         self.appended_q_a_list = []
         for question in data.questions:
             answers = question.answers
             # we are appending each question to each answer in a discussion
-            self.appended_q_a_list.extend([question.question + '\n\n\n'+ answer.ans for answer in answers])
-            self.docs_embed = self.model.encode(self.appended_q_a_list, normalize_embeddings=True)
-
+            self.appended_q_a_list.extend(
+                [question.question + "\n\n\n" + answer.ans for answer in answers]
+            )
+            self.docs_embed = self.model.encode(
+                self.appended_q_a_list, normalize_embeddings=True
+            )
 
     def fetch_document(self, query: str, top_n=3):
         query_embed = self.model.encode(query, normalize_embeddings=True)

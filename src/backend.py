@@ -1,44 +1,43 @@
-from embeddings import chroma_embedding
-import subprocess
-from fetch_data import fetch_discussions
-from groq import Groq
+from src.embeddings import chroma_embedding
+from src.github.fetch_data import fetch_discussions
+from src.utils import (
+    get_project_name_from_github_url,
+    get_project_owner_from_github_url,
+)
 from dotenv import load_dotenv
-from embeddings.chroma_embedding import ChromaEmbedding
-from fetch_data import fetch_discussions
-import os
 import os
 import openai
 
+
+load_dotenv()
 client = openai.OpenAI(
-    base_url="https://api.groq.com/openai/v1",
-    api_key=os.environ.get("GROQ_TOKEN")
+    base_url="https://api.groq.com/openai/v1", api_key=os.environ.get("GROQ_TOKEN")
 )
 
-def get_project_name_from_github_url(url: str) -> str:
-	return url.split('/')[-1]
 
-def get_project_owner_from_github_url(url: str) -> str:
-	return url.split('/')[-2]
-
-
-def add_github_project(url: str) -> bool:
+def add_github_project(url: str, force_embed=False) -> bool:
     project_name = get_project_name_from_github_url(url)
     owner = get_project_owner_from_github_url(url)
     embedding = chroma_embedding.ChromaEmbedding(collection_name=project_name)
 
-    if not embedding.embedding_exists:
+    if not embedding.embedding_exists or force_embed:
         data = fetch_discussions(owner, project_name)
         embedding.create_embedding(data)
+        print(
+            f"Project {owner}/{project_name} added with {len(data.questions)} questions."
+        )
     return True
 
+
 def list_projects():
-      import os
-      return os.listdir("data")
-      
+    import os
+
+    return os.listdir("data")
+
 
 def construct_prompt(project_name, query):
-	embedding_obj = chroma_embedding.ChromaEmbedding(collection_name=project_name)
-	prompt = f"""
+    embedding_obj = chroma_embedding.ChromaEmbedding(collection_name=project_name)
+    prompt = f"""
     use the following CONTEXT to answer the QUESTION at the end.
     If you don't know the answer, just say that you don't know, don't try to make up an answer.
 
@@ -46,18 +45,18 @@ def construct_prompt(project_name, query):
     QUESTION: {query}
 
     """
-	return prompt
+    return prompt
 
 
 def get_answer(project_name, query) -> str:
     prompt = construct_prompt(project_name, query)
 
-    print (prompt)
+    print(prompt)
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
             {"role": "user", "content": prompt},
-        ]
+        ],
     )
     answer = response.choices[0].message.content
     return answer

@@ -1,15 +1,20 @@
-import json
 import os
+from dotenv import load_dotenv
 
-from data_model import Data, Question, Answer
+from src.github.data_model import Data, Question, Answer
 
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
+load_dotenv()
+
 
 # Select your transport with a defined url endpoint
 token = os.environ["GITHUB_TOKEN"]
-transport = AIOHTTPTransport(url="https://api.github.com/graphql", headers={"Authorization": f"Bearer {token}"})
+print("token=", token if token else "no token found")
+transport = AIOHTTPTransport(
+    url="https://api.github.com/graphql", headers={"Authorization": f"Bearer {token}"}
+)
 
 # Create a GraphQL client using the defined transport
 client = Client(transport=transport, fetch_schema_from_transport=True)
@@ -60,15 +65,20 @@ get_repo_discussions_query_v2 = gql(
 
 def fetch_discussions(owner, project_name):
     # Execute the query on the transport
-    result = client.execute(get_repo_discussions_query_v2, variable_values={"owner": owner, "project_name": project_name})
-    
+    result = client.execute(
+        get_repo_discussions_query_v2,
+        variable_values={"owner": owner, "project_name": project_name},
+    )
+
     questions = []
     for discussion in result["repository"]["discussions"]["nodes"]:
         answers = []
         for comment in discussion["comments"]["nodes"]:
             answers.append(Answer(id=comment["id"], ans=comment["bodyText"]))
-        
-        questions.append(Question(id=discussion["id"], question=discussion["title"], answers=answers))
-    
-    print ("got questions count=", len(questions))
+
+        questions.append(
+            Question(id=discussion["id"], question=discussion["title"], answers=answers)
+        )
+
+    print("got questions count=", len(questions))
     return Data(questions=questions)
