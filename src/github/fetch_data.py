@@ -11,7 +11,6 @@ load_dotenv()
 
 # Select your transport with a defined url endpoint
 token = os.environ["GITHUB_TOKEN"]
-print("token=", token if token else "no token found")
 transport = AIOHTTPTransport(
     url="https://api.github.com/graphql", headers={"Authorization": f"Bearer {token}"}
 )

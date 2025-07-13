@@ -1,9 +1,9 @@
 import re
 import streamlit as st
 from src.backend import add_github_project
+import os
 
-
-st.title("Add Github Project")
+st.header("Add Github Project")
 
 
 def is_valid_github_repo(url: str) -> bool:
@@ -25,6 +25,13 @@ def is_valid_github_repo(url: str) -> bool:
 
 if "projects" not in st.session_state:
     st.session_state.projects = {}
+    dirs = os.listdir("data")
+    for item in dirs:
+        with open(f"data/{item}/name.txt", "r") as f:
+            full_repo_name = f.read().strip()
+            repo_url = f"https://github.com/{full_repo_name}"
+            st.session_state.projects[repo_url] = full_repo_name
+
 
 st.subheader("Enter your Github Project URL")
 title = st.text_input("Repo URL")

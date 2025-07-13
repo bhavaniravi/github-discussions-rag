@@ -26,6 +26,10 @@ def add_github_project(url: str, force_embed=False) -> bool:
         print(
             f"Project {owner}/{project_name} added with {len(data.questions)} questions."
         )
+    if not os.path.exists(f"data/{project_name}/name.txt"):
+        os.makedirs(f"data/{project_name}", exist_ok=True)
+        with open(f"data/{project_name}/name.txt", "w") as f:
+            f.write(f"{owner}/{project_name}")
     return True
 
 
